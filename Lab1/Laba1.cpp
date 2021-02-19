@@ -1,49 +1,54 @@
-﻿//#include "stdafx.h"
+//#include "stdafx.h"
 #include <iostream>
 #include <fstream>
 
 using namespace std;
 
-void AddElements(float*& , int& ,int);
-void DelElements(float*& , int& ,int);
-float* MemoryArray(int );
-void InputArray(int , float* );
-void OutputArray(int , float*);
-int FindEllement(int , float* );
-int FindEllementAvto(int, float*,float);
+void AddElements(float*&, int&, int);
+void DelElements(float*&, int&, int);
+float* MemoryArray(int);
+void InputArray(int, float*);
+void OutputArray(int, float*);
+int FindEllement(int, float*);
+int FindEllementAvto(int, float*, float);
 
-int main(){
+int main() {
 	//int count;
 	//cout << "Enter array size" << endl;
 	//cin >> count;
 	ifstream in("Array.txt");
-	if (!in){
+	if (!in) {
 		cout << "! --- Error --- ! Can't open file \"Array.txt\" \n";
 		system("pause");
 		return 0;
 	}
-	int count = 0, target=-1;
-	float x,avto;
+	int count = 0, target = -1;
+	float x, avto;
 	while (in >> x) count++;
 	in.close();
+	if (count == 0) {
+		cout << "! --- Error --- ! File is empty \n";
+		system("pause");
+		return 0;
+	}
 	cout << "Sucsesfully make array with size: " << count << endl;
 	float* arr = MemoryArray(count);
 	InputArray(count, arr);
 	char K;
-	do{
-		cout << "1 - Add element;\n2 - Delet element;\n3 - Add element after finding number;"<<endl
-			<< "4 - Delete all chosen elements;\ns - Show Array on string;\nq - Exit"<< endl;
+	do {
+		cout << "\n1 - Add element;\n2 - Delet element;\n3 - Add element after finding number;" << endl
+			<< "4 - Delete all chosen elements;\ns - Show Array on string;\nq - Exit" << endl;
 		cin >> K;
 		switch (K)
 		{
 		case '1':
-			AddElements(arr, count,-1);
+			AddElements(arr, count, -1);
 			break;
 		case '2':
-			DelElements(arr, count,-1);
+			DelElements(arr, count, -1);
 			break;
 		case '3':
-			target = FindEllement(count, arr)+1;
+			target = FindEllement(count, arr) + 1;
 			if (target == 0) break;
 			AddElements(arr, count, target);
 			cout << "Sucsessfully add new ellemnt to [" << target << "] position." << endl;
@@ -75,17 +80,17 @@ int main(){
 	return 0;
 }
 
-float* MemoryArray(int count){
+float* MemoryArray(int count) {
 	float* arr = new float[count];
 	return arr;
 }
 
-void AddElements(float*& arr, int& count,int target)
+void AddElements(float*& arr, int& count, int target)
 {
 	int index;
 	if (target == -1) {
 		cout << endl << "Chose position to add element('0' - begin,'-1' - end): " << endl;
-		cin >> index; 
+		cin >> index;
 		if (index == -1) index = count;
 	}
 	else index = target;
@@ -105,13 +110,12 @@ void AddElements(float*& arr, int& count,int target)
 		}
 		delete[] arr;
 		arr = buff;
+
 		count += 1;
-		//cout << "buff array" << endl;
-		//OutputArray(count, buff);
 	}
 }
 
-void DelElements(float*& arr, int& count,int target) {
+void DelElements(float*& arr, int& count, int target) {
 	int index;
 	if (target == -1) {
 		cout << endl << "Chose position to del element('0' - begin,'-1' - end): " << endl;
@@ -123,7 +127,7 @@ void DelElements(float*& arr, int& count,int target) {
 		cout << "Error" << endl;
 	}
 	else {
-		float* buff = new float [count - 1] ;
+		float* buff = new float[count - 1];
 		for (int i = 0; i < index; i++)
 		{
 			buff[i] = arr[i];
@@ -135,8 +139,6 @@ void DelElements(float*& arr, int& count,int target) {
 		delete[] arr;
 		arr = buff;
 		count -= 1;
-		//cout << "buff array" << endl;
-		//OutputArray(count, buff);
 	}
 }
 
@@ -160,7 +162,7 @@ int FindEllement(int count, float* arr) {
 	return fnum;
 }
 
-int FindEllementAvto(int count, float* arr,float avto) {
+int FindEllementAvto(int count, float* arr, float avto) {
 	int fnum;
 	bool a = false;
 	for (int i = 0; i < count && a == false; i++) {
@@ -189,7 +191,7 @@ void InputArray(int count, float* arr)
 
 void OutputArray(int count, float* arr)
 {
-	cout << "Your array is: ";
+	cout << "\nYour array is: \n";
 	for (int i = 0; i < count; i++)
 	{
 		cout << arr[i] << " ";
