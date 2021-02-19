@@ -51,7 +51,6 @@ int main() {
 			target = FindEllement(count, arr) + 1;
 			if (target == 0) break;
 			AddElements(arr, count, target);
-			cout << "Sucsessfully add new ellemnt to [" << target << "] position." << endl;
 			target = -1;
 			break;
 		case '4':
@@ -61,7 +60,6 @@ int main() {
 				target = FindEllementAvto(count, arr, avto);
 				if (target != -1) {
 					DelElements(arr, count, target);
-					cout << "Sucsessfully delete ellemnt from [" << target << "] position." << endl;
 				}
 			} while (target != -1);
 			break;
@@ -88,6 +86,7 @@ float* MemoryArray(int count) {
 void AddElements(float*& arr, int& count, int target)
 {
 	int index;
+	float input;
 	if (target == -1) {
 		cout << endl << "Chose position to add element('0' - begin,'-1' - end): " << endl;
 		cin >> index;
@@ -98,20 +97,22 @@ void AddElements(float*& arr, int& count, int target)
 		cout << "Error" << endl;
 	}
 	else {
+		cout << endl << "Chose value of added element: " << endl;
+		cin >> input;
 		float* buff = new float[count + 1];
 		for (int i = 0; i < index; i++)
 		{
 			buff[i] = arr[i];
 		}
-		buff[index] = 10;
+		buff[index] = input;
 		for (int i = index + 1; i < count + 1; i++)
 		{
 			buff[i] = arr[i - 1];
 		}
+		cout << "Sucsessfully add new ellemnt to [" << index << "] position." << endl;
 		delete[] arr;
 		arr = buff;
-
-		count += 1;
+		count ++;
 	}
 }
 
@@ -136,6 +137,7 @@ void DelElements(float*& arr, int& count, int target) {
 		{
 			buff[i] = arr[i + 1];
 		}
+		cout << "Sucsessfully delete ellemnt from [" << index << "] position." << endl;
 		delete[] arr;
 		arr = buff;
 		count -= 1;
