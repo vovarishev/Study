@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -34,10 +34,10 @@ int main() {
 	cin >> M;
 	M++;
 
-	A = new double*[N];
+	A = new double* [N];
 	for (unsigned int i = 0; i < N; i++) A[i] = new double[M];
 
-	B = new double*[N];
+	B = new double* [N];
 	for (unsigned int i = 0; i < N; i++) B[i] = new double[M];
 
 	results = new double[N];
@@ -103,33 +103,43 @@ void PrintMatr(unsigned int N, unsigned int M, double** A) {// Вывод мат
 
 bool TriangMatr(double** A, double** B, double& determ, int n) {// Триангуляция матрицы + Определитель
 	double koef;
-	double max=0;
+	double max = 0;
+	double zeroCheck;
 	unsigned int maxIndex;
 	for (unsigned int i = 0; i < n; i++) for (unsigned int j = 0; j < n + 1; j++) B[i][j] = A[i][j];// Заполнение матрицы для вычислений
 
-	for (unsigned int k = 0; k < n; k++) for (unsigned int i = k + 1; i < n; i++) {// Триангуляция построчно
-		if (B[k][k] == 0) {// Смена строк
-			for (unsigned int l = k; l < n; l++) {
-				if (fabs(B[l][k]) > max) {
+	for (unsigned int k = 0; k < n; k++) {// Триангуляция построчно
+		if (B[k][k] == 0) {// Выбор ведущего элеента
+			for (unsigned int i = k+1; i < n; i++) {// Поиск подходящей строки
+				if (fabs(B[i][k]) > max) {
 					max = fabs(B[i][k]);
-					maxIndex = l;
+					maxIndex = i;
 				}
 			}
-			if (max>0) {
+			if (max > 0) {
 				for (unsigned int j = 0; j < n + 1; j++) {
 					swap(B[k][j], B[maxIndex][j]);
-					determ *= -1;
 				}
+				determ *= -1;
 			}
 			else {
-				//----------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-----------//Смена строк
+				cout << "\nНевозможно выбрать ведущий элемент\n";
+				return false;
 			}
 		}
-		koef = -1 * B[i][k] / B[k][k];
-		for (unsigned int j = k; j < n + 1; j++) B[i][j] = B[i][j] + B[k][j] * koef;// Преобразование последующих строк
+		zeroCheck = 0;
+		for (unsigned int i = 0; i < n + 1; i++) zeroCheck += B[k][i];
+		if (zeroCheck == 0) {
+			cout << "\nИмеются коллинеарные или нулевые строки\n";
+			return false;
+		}
+		for (unsigned int i = k + 1; i < n; i++) {
+			koef = -1 * B[i][k] / B[k][k];
+			for (unsigned int j = k; j < n + 1; j++) B[i][j] = B[i][j] + B[k][j] * koef;// Преобразование последующих строк
+		}
+		determ *= B[k][k];// Вычисление определителя
 	}
-	for (unsigned int l = 0; l < n; l++) determ *= B[l][l];// Вычисление определителя
-														   //PrintMatr(n, n + 1, B);
+	//PrintMatr(n, n + 1, B);
 
 	return true;
 }
