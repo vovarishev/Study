@@ -34,10 +34,10 @@ int main() {
 	cin >> M;
 	M++;
 
-	A = new double* [N];
+	A = new double*[N];
 	for (unsigned int i = 0; i < N; i++) A[i] = new double[M];
 
-	B = new double* [N];
+	B = new double*[N];
 	for (unsigned int i = 0; i < N; i++) B[i] = new double[M];
 
 	results = new double[N];
@@ -109,8 +109,9 @@ bool TriangMatr(double** A, double** B, double& determ, int n) {// Трианг�
 	for (unsigned int i = 0; i < n; i++) for (unsigned int j = 0; j < n + 1; j++) B[i][j] = A[i][j];// Заполнение матрицы для вычислений
 
 	for (unsigned int k = 0; k < n; k++) {// Триангуляция построчно
-		if (B[k][k] == 0) {// Выбор ведущего элеента
-			for (unsigned int i = k+1; i < n; i++) {// Поиск подходящей строки
+		if (B[k][k] == 0) {// Выбор ведущего элемента
+			max = fabs(B[k][k]);
+			for (unsigned int i = k + 1; i < n; i++) {// Поиск подходящей строки
 				if (fabs(B[i][k]) > max) {
 					max = fabs(B[i][k]);
 					maxIndex = i;
