@@ -3,6 +3,14 @@
 #include <fstream>
 #include <string>
 
+/*-----------------------------------------------------------------------
+-------------------------------------------------------------------------
+--!-----------------ОСТОРОЖНО!!! Некачественный код!------------------!--
+--!------При попадание некачестенного кода на поверхность глаза,------!--
+--!НЕМЕДЛЕННО промыть глаза под холодной водой и выпить чай с ромашкой!--
+-------------------------------------------------------------------------
+-----------------------------------------------------------------------*/
+
 using namespace std;
 
 //---------------------------------------------------------------------------Структуры
@@ -84,7 +92,7 @@ struct MyQueue {						//------Очередь
 	Node* First = NULL;
 	int Count=0;
 	bool Push(Product);
-	bool Pop(Product&);
+	bool Pop();
 	void Report();
 };
 
@@ -108,7 +116,7 @@ bool MyQueue::Push(Product data) {		//------Пополнение очереди
 	return true;
 }
 
-bool MyQueue::Pop(Product& data) {					//------Удаление элемента из очереди
+bool MyQueue::Pop() {					//------Удаление элемента из очереди
 	if (!First) {
 		cout << "--->Queue is empty" << endl;
 		return false;
@@ -131,15 +139,18 @@ void MyQueue::Report() {				//------Информация про очередь
 		cout << "Count:" << First->data.count << "\tBuy cost" << First->data.costBuy << endl;
 		cout << "Enter sell price:" << endl;
 		cin >> sell;
-		if (sell <= First->data.costBuy) cout << "Sell price is low, try sell later;";
+		system("cls");
+		if (sell <= First->data.costBuy) cout << "Sell price is low, try sell later;\n";
 		else {
 			profit = (sell - First->data.costBuy) * First->data.count;
-			cout << "Profit by sell:" << profit;
+			cout << "If sell "<< First->data.count <<" products by "<<sell<<" cost, Profit is:"<< profit<<endl;
 		}
 	}
 }
 //---------------------------------------------------------------------------Функции
+int GetNum();
 int Queue();
+bool QueueSell(MyQueue&);
 int Stack();
 bool StackGetFile(MyStack&);
 bool StackRemoveObject(MyStack&);
@@ -148,7 +159,7 @@ int main()
 {
 	char k;
 	cout << "---------------------------" << endl;
-	cout << "Menu: \ns - Work with stack; \q - Work with Queue; \ne - Exit; " << endl;
+	cout << "Menu: \ns - Work with Stack; \nq - Work with Queue; \ne - Exit; " << endl;
 	cin >> k;
 	do {
 		switch (k) {
@@ -169,13 +180,24 @@ int main()
 	return 0;
 }
 
+int GetNum()
+{
+	float n;
+	do {
+		cin >> n;
+		if ((n - (int)n != 0) || n <= 0) cout << " --->Error, enter int number:" << endl;
+	} while ((n - (int)n != 0) || n <= 0);
+	return n;
+}
+
 int Queue() {
 	Product prod;
 	MyQueue qMain;
 	char k;
+	system("cls");
 	do {								//------Меню
 		cout << "---------------------------" << endl;
-		cout << "Menu: \nr - Show report about stack; \na - Add object to queue \ne - Exit; " << endl;
+		cout << "Menu: \nr - Show report about chart; \na - Add product to chart \ns - Sell products \ne - Exit; " << endl;
 		cin >> k;
 		system("cls");
 		switch (k) {
@@ -184,13 +206,16 @@ int Queue() {
 			break;
 		case 'a':
 			cout << "Enter \nCount: ";
-			cin >> prod.count;
+			prod.count = GetNum();
 			system("cls");
 			cout << "Enter \nBuy cost: ";
-			cin >> prod.costBuy;
+			prod.costBuy = GetNum();
 			system("cls");
 			qMain.Push(prod);
 			cout << "Succesfuly add element to stack! \n";
+			break;
+		case 's':
+			QueueSell(qMain);
 			break;
 		default:
 			if (k != 'e')
@@ -204,10 +229,82 @@ int Queue() {
 	return 0;
 }
 
+bool QueueSell(MyQueue& qMain) {
+	if (!qMain.First) {
+		cout << "--->Queue is empty" << endl;
+		return false;
+	}
+	int costSell, countSell;
+	cout << "Enter sell count:\n";
+	cin >> countSell;
+	system("cls");
+	while (countSell > 0) {
+		if (!qMain.First) {
+			cout << "--->Queue is empty" << endl;
+			return false;
+		}
+		cout << "Enter sell cost:\n";
+		cin >> costSell;
+		system("cls");
+		if (costSell <= qMain.First->data.costBuy) {
+			cout << "---> Cost is very low for sale\n";
+			return false;
+		}
+		char k;
+		if (countSell <= qMain.First->data.count) {
+			cout << "Did you want to sell " << countSell << " products from chart with proft: " << countSell * (costSell - qMain.First->data.costBuy) << "? \n(y/n):";
+			cin >> k;
+			switch (k) {
+			case 'y':
+				qMain.First->data.count -= countSell;
+				countSell = 0;
+				if(qMain.First->data.count==0) qMain.Pop();
+				k = 'e';
+				system("cls");
+				cout << "Sucsesfully sell "<< countSell <<" products"<<endl;
+				break;
+			case'n':
+				return false;
+				break;
+			default:
+				if (k != 'e')
+				{
+					cout << "Nope. Try again.\n ";
+					break;
+				}
+			}
+		}
+		else {
+			cout << "Did you want to sell " << qMain.First->data.count << " products from chart with proft: " << qMain.First->data.count * (costSell - qMain.First->data.costBuy) << "? \n(y/n):";
+			cin >> k;
+			switch (k) {
+			case 'y':
+				countSell -= qMain.First->data.count;
+				qMain.Pop();
+				k = 'e';
+				system("cls");
+				cout << "Sucsesfully sell " << qMain.First->data.count << " products" << endl;
+				break;
+			case'n':
+				return false;
+				break;
+			default:
+				if (k != 'e')
+				{
+					cout << "Nope. Try again.\n ";
+					break;
+				}
+			}
+		}
+	}
+	return true;
+}
+
 int Stack() {
 	Candy candy;
 	MyStack sMain;
 	char k;
+	system("cls");
 	do {								//------Меню
 		cout << "---------------------------" << endl;
 		cout << "Menu: \ni - Show info about stack; \nf - Get parametres from file; \nm - Manualy add object; \nr - Remove object from stack; \nc - Clear stack \ne - Exit; " << endl;
@@ -225,13 +322,13 @@ int Stack() {
 			cin >> candy.name;
 			system("cls");
 			cout << "Enter \nCount: ";
-			cin >> candy.count;
+			candy.count = GetNum();
 			system("cls");
 			cout << "Enter \nBuy cost: ";
-			cin >> candy.costBuy;
+			candy.costBuy = GetNum();
 			system("cls");
 			cout << "Enter \nSell cost: ";
-			cin >> candy.costSell;
+			candy.costSell = GetNum();
 			system("cls");
 			sMain.Push(candy);
 			cout << "Succesfuly add element to stack! \n";
