@@ -35,7 +35,7 @@ struct MyStack {						//------Стек
 	Node* Top = NULL;
 	int Count = 0;
 	bool Push(Candy);
-	bool Pop();
+	bool Pop(Candy&);
 	void Info();
 };
 
@@ -56,12 +56,13 @@ bool MyStack::Push(Candy data) {		//------Пополнение стека
 	return true;
 }
 
-bool MyStack::Pop() {					//------Удаление элемента из стека
+bool MyStack::Pop(Candy& data) {					//------Удаление элемента из стека
 	if (!Top) {
 		cout << "--->Stack is empty" << endl;
 		return false;
 	}
 	Node* temp = Top->prev;
+	data = Top->data;
 	delete Top;
 	Top = temp;
 	Count--;
@@ -92,7 +93,7 @@ struct MyQueue {						//------Очередь
 	Node* First = NULL;
 	int Count = 0;
 	bool Push(Product);
-	bool Pop();
+	bool Pop(Product&);
 	void Report();
 };
 
@@ -116,7 +117,7 @@ bool MyQueue::Push(Product data) {		//------Пополнение очереди
 	return true;
 }
 
-bool MyQueue::Pop() {					//------Удаление элемента из очереди
+bool MyQueue::Pop(Product&) {					//------Удаление элемента из очереди
 	if (!First) {
 		cout << "--->Queue is empty" << endl;
 		return false;
@@ -195,7 +196,7 @@ int Queue() {
 	MyQueue qMain;
 	char k;
 	system("cls");
-	do {								
+	do {
 		cout << "---------------------------" << endl;
 		cout << "Menu: \nr - Show report about chart; \na - Add product to chart \ns - Sell products \ne - Exit; " << endl;
 		cin >> k;
@@ -225,7 +226,7 @@ int Queue() {
 			}
 		}
 	} while (k != 'e');
-	while (qMain.Pop());
+	while (qMain.Pop(prod));
 	return 0;
 }
 
@@ -234,6 +235,7 @@ bool QueueSell(MyQueue& qMain) {
 		cout << "--->Queue is empty" << endl;
 		return false;
 	}
+	Product prod;
 	int costSell, countSell;
 	cout << "Enter sell count:\n";
 	cin >> countSell;
@@ -258,7 +260,7 @@ bool QueueSell(MyQueue& qMain) {
 			case 'y':
 				qMain.First->data.count -= countSell;
 				countSell = 0;
-				if (qMain.First->data.count == 0) qMain.Pop();
+				if (qMain.First->data.count == 0) qMain.Pop(prod);
 				k = 'e';
 				system("cls");
 				cout << "Sucsesfully sell " << countSell << " products" << endl;
@@ -280,7 +282,7 @@ bool QueueSell(MyQueue& qMain) {
 			switch (k) {
 			case 'y':
 				countSell -= qMain.First->data.count;
-				qMain.Pop();
+				qMain.Pop(prod);
 				k = 'e';
 				system("cls");
 				cout << "Sucsesfully sell " << qMain.First->data.count << " products" << endl;
@@ -305,7 +307,7 @@ int Stack() {
 	MyStack sMain;
 	char k;
 	system("cls");
-	do {								
+	do {
 		cout << "---------------------------" << endl;
 		cout << "Menu: \ni - Show info about stack; \nf - Get parametres from file; \nm - Manualy add object; \nr - Remove object from stack; \nc - Clear stack \ne - Exit; " << endl;
 		cin >> k;
@@ -338,7 +340,7 @@ int Stack() {
 			StackRemoveObject(sMain);
 			break;
 		case 'c':
-			while (sMain.Pop());
+			while (sMain.Pop(candy));
 			break;
 		default:
 			if (k != 'e')
@@ -348,7 +350,7 @@ int Stack() {
 			}
 		}
 	} while (k != 'e');
-	while (sMain.Pop());
+	while (sMain.Pop(candy));
 	return 0;
 }
 
@@ -369,20 +371,26 @@ bool StackGetFile(MyStack& Stack) {			//------Заполнение стека и
 }
 
 bool StackRemoveObject(MyStack& sMain) {
-	string candy;
+	Candy candy,temp;
 	int N;
 	MyStack sTemp;
 	bool stopFind = false, find = false;
 	cout << "Enter for delete \nName: ";
-	cin >> candy;
+	cin >> candy.name;
 	system("cls");
 	cout << "Enter for delete \nCount: ";
-	N=GetNum();
+	candy.count = GetNum();
+	system("cls");
+	cout << "Enter for delete \nCost Buy: ";
+	candy.costBuy = GetNum();
+	system("cls");
+	cout << "Enter for delete \nCost Sell: ";
+	candy.costSell = GetNum();
 	system("cls");
 	while (stopFind == false) {
 		sTemp.Push(sMain.Top->data);
-		sMain.Pop();
-		if (sTemp.Top->data.name == candy&& N == sTemp.Top->data.count) {
+		sMain.Pop(temp);
+		if (sTemp.Top->data.name == candy.name&& sTemp.Top->data.count == candy.count&& sTemp.Top->data.costBuy == candy.costBuy&& sTemp.Top->data.costSell == candy.costSell) {
 			find = true;
 			stopFind = true;
 			break;
@@ -393,22 +401,15 @@ bool StackRemoveObject(MyStack& sMain) {
 		}
 	}
 	if (find == true) {
-		sTemp.Pop();
-		cout << "Succesfuly remove " << candy << " named object!\n";
+		sTemp.Pop(candy);
+		cout << "Succesfuly remove " << candy.name << " named object!\n";
 	}
 	else {
-		cout << "--->Can't find " << candy << " named object!\n";
+		cout << "--->Can't find " << candy.name << " named object!\n";
 	}
 
 	stopFind = false;
-	while (stopFind == false) {
-		if (find != true) {
-			sMain.Push(sTemp.Top->data);
-			sTemp.Pop();
-		}
-		find = false;
-		if (sTemp.Top == NULL) stopFind = true;
-	}
+	while (sTemp.Pop(candy)) sMain.Push(candy);
 	find = false;
 	sMain.Info();
 	return true;
