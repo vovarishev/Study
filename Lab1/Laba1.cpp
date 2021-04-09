@@ -1,120 +1,203 @@
 //#include "stdafx.h"
 #include <iostream>
 #include <fstream>
-#include <string>
 
 using namespace std;
 
-//---------------------------------------------------------------------------Структуры
-struct Candy {							//------Конфеты
-	string name;
-	int count;
-	int costBuy;
-	int costSell;
-	void Out();
-};
+void AddElements(float*&, int&, int);
+void DelElements(float*&, int&, int);
+float* MemoryArray(int);
+void InputArray(int, float*);
+void OutputArray(int, float*);
+int FindEllement(int, float*);
+int FindEllementAvto(int, float*, float);
 
-struct MyStack {						//------Стек
-	struct Node {
-		Candy data;
-		Node* prev;
-	};
-	Node* Top = NULL;
-	int Count;
-	bool Push(Candy);
-	bool Pop(Candy&);
-	void Info();
-};
-
-bool MyStack::Push(Candy data) {		//------Пополнение стека
-	if (!Top) {
-		Top = new Node;
-		Top->prev = NULL;
-		Count = 1;
+int main() {
+	//int count;
+	//cout << "Enter array size" << endl;
+	//cin >> count;
+	ifstream in("Array.txt");
+	if (!in) {
+		cout << "! --- Error --- ! Can't open file \"Array.txt\" \n";
+		system("pause");
+		return 0;
 	}
-	else {
-		Node* temp;
-		temp = new Node;
-		temp->prev = Top;
-		Top = temp;
-		Count++;
+	int count = 0, target = -1;
+	float x, avto;
+	while (in >> x) count++;
+	in.close();
+	if (count == 0) {
+		cout << "! --- Error --- ! File is empty \n";
+		system("pause");
+		return 0;
 	}
-	Top->data = data;//!!!Узкое место
-	return true;
-}
-
-bool MyStack::Pop(Candy& data) {		//------Удаление элемента из стека
-	if (!Top) return false;
-	Node* temp = Top->prev;
-	data = Top->data; 
-	delete Top;
-	Top = temp; Count--;
-	return true;
-}
-
-void MyStack::Info() {					//------Информация про стек
-	if (!Top)
-		cout << "--->Stack is empty" << endl;
-	else {
-		cout << "Stack info: " << endl;
-		cout << "Stack size:" << Count << endl;
-		cout << "Top data:" << endl;
-		Top->data.Out();
-	}
-}
-
-void Candy::Out() {						//------Вывод объекта на экран
-	cout << "Name:" << name << "\tCount:" << count << "\tBuy cost:" << costBuy << "\tSell cost:" << costSell << endl;
-}
-
-bool GetFile(MyStack&);
-
-int main()
-{
-	Candy candy;
-	MyStack sMain,sTemp;
-	char k;
-	do {								//------Меню
-		cout << "---------------------------" << endl;
-		cout << "Menu: \ni - Show info about stack; \nf - Get parametres from file; \nm - Manualy add object; \nq - Quit;" << endl;
-		cin >> k;
-		system("cls");
-		switch (k) {
-		case 'i':
-			sMain.Info();
+	cout << "Sucsesfully make array with size: " << count << endl;
+	float* arr = MemoryArray(count);
+	InputArray(count, arr);
+	char K;
+	do {
+		cout << "\n1 - Add element;\n2 - Delet element;\n3 - Add element after finding number;" << endl
+			<< "4 - Delete all chosen elements;\ns - Show Array on string;\nq - Exit" << endl;
+		cin >> K;
+		switch (K)
+		{
+		case '1':
+			AddElements(arr, count, -1);
 			break;
-		case 'f':
-			GetFile(sMain);
+		case '2':
+			DelElements(arr, count, -1);
+			break;
+		case '3':
+			target = FindEllement(count, arr) + 1;
+			if (target == 0) break;
+			AddElements(arr, count, target);
+			target = -1;
+			break;
+		case '4':
+			cout << endl << "Enter chosen number: " << endl;
+			cin >> avto;
+			do {
+				target = FindEllementAvto(count, arr, avto);
+				if (target != -1) {
+					DelElements(arr, count, target);
+				}
+			} while (target != -1);
+			break;
+		case 's':
+			OutputArray(count, arr);
 			break;
 		default:
-			if (k != 'q')
+			if (K != 'q')
 			{
 				cout << "Nope. Try again.\n ";
 				break;
 			}
 		}
-	}
-	while (k != 'q');
-	cout << "---------------------------" << endl << endl;
-	while (sMain.Pop(candy))
-		candy.Out();
-	cout << endl;
-	cout << "---------------------------" << endl;
-	sMain.Info();
+	} while (K != 'q');
+	delete[] arr;
+	return 0;
 }
 
-bool GetFile(MyStack& Stack) {			//------Заполнение стека из файла
-	ifstream F("List.txt");
-	if (!F) {
-		cout << "Cant find file" << endl;
-		return false;
-	}
-	Candy candy;
+float* MemoryArray(int count) {
+	float* arr = new float[count];
+	return arr;
+}
 
-	while (F >> candy.name >> candy.count>>candy.costBuy>>candy.costSell) {
-		Stack.Push(candy);
+void AddElements(float*& arr, int& count, int target)
+{
+	int index;
+	float input;
+	if (target == -1) {
+		cout << endl << "Chose position to add element('0' - begin,'-1' - end): " << endl;
+		cin >> index;
+		if (index == -1) index = count;
 	}
-	F.close();
-	cout << "Succesfully read file" << endl;
-	return true;
+	else index = target;
+	if (index < 0 || index > count) {
+		cout << "Error" << endl;
+	}
+	else {
+		cout << endl << "Chose value of added element: " << endl;
+		cin >> input;
+		float* buff = new float[count + 1];
+		for (int i = 0; i < index; i++)
+		{
+			buff[i] = arr[i];
+		}
+		buff[index] = input;
+		for (int i = index + 1; i < count + 1; i++)
+		{
+			buff[i] = arr[i - 1];
+		}
+		cout << "Sucsessfully add new ellemnt to [" << index << "] position." << endl;
+		delete[] arr;
+		arr = buff;
+		count ++;
+	}
+}
+
+void DelElements(float*& arr, int& count, int target) {
+	int index;
+	if (target == -1) {
+		cout << endl << "Chose position to del element('0' - begin,'-1' - end): " << endl;
+		cin >> index;
+		if (index == -1) index = count;
+	}
+	else index = target;
+	if (index < 0 || index > count) {
+		cout << "Error" << endl;
+	}
+	else {
+		float* buff = new float[count - 1];
+		for (int i = 0; i < index; i++)
+		{
+			buff[i] = arr[i];
+		}
+		for (int i = index; i < count - 1; i++)
+		{
+			buff[i] = arr[i + 1];
+		}
+		cout << "Sucsessfully delete ellemnt from [" << index << "] position." << endl;
+		delete[] arr;
+		arr = buff;
+		count -= 1;
+	}
+}
+
+int FindEllement(int count, float* arr) {
+	float chosen;
+	int fnum;
+	bool a = false;
+	cout << endl << "Enter chosen number: " << endl;
+	cin >> chosen;
+	for (int i = 0; i < count && a == false; i++) {
+		if (arr[i] == chosen) {
+			a = true;
+			fnum = i;
+		}
+	}
+	if (a == false) {
+		cout << "! --- Error --- !: can't find chosen number\n";
+		return -1;
+	}
+	else cout << "Index of your number is [" << fnum << "]" << endl;
+	return fnum;
+}
+
+int FindEllementAvto(int count, float* arr, float avto) {
+	int fnum;
+	bool a = false;
+	for (int i = 0; i < count && a == false; i++) {
+		if (arr[i] == avto) {
+			a = true;
+			fnum = i;
+		}
+	}
+	if (a == false) {
+		cout << "! --- Error --- !: can't find chosen number\n";
+		return -1;
+	}
+	else cout << "Index of your number is [" << fnum << "]" << endl;
+	return fnum;
+}
+
+void InputArray(int count, float* arr)
+{
+	ifstream in("Array.txt");
+	for (int i = 0; i < count; i++)
+	{
+		in >> arr[i];
+	}
+	in.close();
+}
+
+void OutputArray(int count, float* arr)
+{
+	cout << "\nYour array is: \n";
+	for (int i = 0; i < count; i++)
+	{
+		cout << arr[i] << " ";
+	}
+	cout << endl;
+	cout << "Size of Array: " << count << " elements" << endl;
 }
