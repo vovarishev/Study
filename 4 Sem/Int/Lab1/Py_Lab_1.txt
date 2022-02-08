@@ -233,7 +233,44 @@ while i <= strCnt:
 
 ---
 12:
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+n = int(input())
+curL = int(1)
+prevL = int(0)
+tempL = int(0)
+i = int(1)
+numL = int(1)
+
+while n>0:
+    # Проверка длины чисел в пирамиде для сглаживания при смене разряда
+    if(len(str(i + curL - 2)) > numL): 
+        curL -= numL
+        prevL -= numL
+        numL = len(str(i + curL - 2))
+
+    if ((curL) <= n):
+        tempL = curL
+        print( )
+        while tempL > 0:
+            print (i, end=' ')
+            tempL -= 1
+            i += 1
+        prevL = curL
+        n -= curL
+        curL += 1
+        
+    elif ((prevL) <= n):
+        tempL = prevL
+        print( )
+        while tempL > 0:
+            print (i, end=' ')
+            tempL -= 1
+            i += 1
+        n -= prevL
+        
+    else:
+        print (i, end=' ')
+        i += 1
+        n -= 1
 
 ---
 13:
